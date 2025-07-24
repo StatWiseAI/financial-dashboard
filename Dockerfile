@@ -4,18 +4,31 @@ FROM rocker/shiny:4.3.0
 RUN apt-get update && apt-get install -y \
     libcurl4-gnutls-dev \
     libssl-dev \
+    libxml2-dev \
+    libfontconfig1-dev \
+    libcairo2-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /srv/shiny-server
 
 # Copy app files
-COPY app.R ./
-COPY custom.css ./www/
-COPY *.R ./
+COPY . .
 
-# Install basic packages
-RUN R -e "install.packages(c('shiny', 'shinydashboard'), repos='https://cloud.r-project.org')"
+# Install R packages (including DT and others your app needs)
+RUN R -e "install.packages(c( \
+    'shiny', \
+    'shinydashboard', \
+    'DT', \
+    'plotly', \
+    'dplyr', \
+    'readr', \
+    'htmltools', \
+    'shinycssloaders', \
+    'openxlsx', \
+    'scales', \
+    'lubridate' \
+), repos='https://cloud.r-project.org')"
 
 # Expose port
 EXPOSE 3838
